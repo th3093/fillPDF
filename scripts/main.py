@@ -4,62 +4,45 @@ main routine
 
 from scripts import read_xlsx, pdf_handler
 import os
+import sys
 
-# Datendateien
-urex_daten = '../data/urex.xlsx'
-wnd_daten = '../data/wnd.xlsx'
 
-group_dict = {1: 'UG',
-              2: 'Hesedenz',
-              3: 'Brendel',
-              4: 'Potempa',
-              5: 'Mittermüller',
-              6: 'Lenz-Braun',
-              7: 'Lorenz, Udo',
-              8: 'Ließfeld',
-              9: 'Königer',
-              10: 'Gessner',
-              11: 'Weisgerber',
-              12: 'Klein',
-              13: 'Lorenz, Dieter',
-              14: 'Kirsch',
-              15: 'Brill',
-              16: 'Magold',
-              17: 'Römer',
-              18: 'Maurer',
-              19: 'Theis',
-              20: 'Mörsdorf'}
+group_dict = {
+    1: 'Group1',
+    2: 'Group2',
+    3: 'Group3',
+    4: 'Group4',
+    5: 'Group5',
+    6: 'Group6'
+}
 
-# PDF - spezifisches
+# PDF specific paths
 tmp_path = '../files/pdf_tmp/'
 template_path = '../data/template.pdf'
 blank_path = '../data/blank.pdf'
-output_path = '../files/pdf_final/'
-# 1 als platzhalter; wird später durch datum ersetzt
-output_file_urex = '../files/pdf_final/final_urex-1.pdf'
-output_file_wnd = '../files/pdf_final/final_wnd-1.pdf'
+# 1 as placeholder for date
+output_file_with_group_selector = '../files/pdf_final/final_group-1.pdf'
+output_file_without_group_selector = '../files/pdf_final/final_not_group-1.pdf'
 
 datums = []
 
 
-# function for handling commmand shell output
+# function for handling cmd output
 # input:    msg as str
 def bash_ui(msg):
     os.system('cls')
     print(msg)
 
 
-def generate_blank_pages(index, filelist, group, pdf):
-    while index % 4 != 0:
-        filelist.append(pdf.blank_page_append(group, index))
-        # tmp_files.append(pdf.divider_page('', group, index)) alternative //
-        index += 1
-    return [index, filelist]
+# handles process of filling PDFs with group selector active
+# Input:    inp_fn as path of input xlsx
+#           out_fn as folder path of final PDFs
+#           tmp_p as folder path of temporary PDFs
+#           template_p as path of template PDF to fill
+#           blank_p as path of blank PDF as divider
+def with_group_selector(inp_fn, out_fn, tmp_p, template_p, blank_p):
 
-
-def urex(out_fn, tmp_p, template_p, blank_p):
-    # Urex - Data
-    data = read_xlsx.read_and_preprocess(urex_daten, 'u')
+    data = read_xlsx.read_and_preprocess(inp_fn, 'input_data1')
 
     for datum in datums[12:29]:
 
@@ -78,14 +61,6 @@ def urex(out_fn, tmp_p, template_p, blank_p):
                 index += 1
                 bash_ui(f"\nStep:  {row+1} / {len(data[group])}  -----  {((row+1) / len(data[group]) * 100):.2f} %\n\n")
 
-            '''# generating blank filler pages
-            while index % 4 != 0:
-                tmp_files.append(pdf.blank_page_append(group, index))
-                #tmp_files.append(pdf.divider_page('', group, index)) alternative //
-                index += 1'''
-            # für blank pages am ende der gruppe ( 4x A6 auf A4)
-            #index, tmp_files = generate_blank_pages(index, tmp_files, group, pdf)
-
             bash_ui(f"\nFinished Groups:  {group} / {len(data)}  -----  {(group / len(data) * 100):.2f} %\n\n")
 
         print('Waiting on merge...')
@@ -93,9 +68,14 @@ def urex(out_fn, tmp_p, template_p, blank_p):
         bash_ui(f"\nFinal PDFs finished:   {int(datum[:2])} / {len(datums)}  -----  {(int(datum[:2]) / len(datums)*100):.2f} %\n\n")
 
 
-def wen(out_fn, tmp_p, template_p):
-    #wen - data
-    data = read_xlsx.read_and_preprocess(wnd_daten, 'w')
+# handles process of filling PDFs without group selector active
+# Input:    inp_fn as path of input xlsx
+#           out_fn as folder path of final PDFs
+#           tmp_p as folder path of temporary PDFs
+#           template_p as path of template PDF to fill
+def without_group_selector(inp_fn, out_fn, tmp_p, template_p):
+
+    data = read_xlsx.read_and_preprocess(inp_fn, 'input_data2')
 
     for datum in datums[12:29]:
         tmp_files = []
@@ -115,9 +95,9 @@ def wen(out_fn, tmp_p, template_p):
         bash_ui(f"\nFinal PDFs finished:   {int(datum[:2])} / {len(datums)}  -----  {(int(datum[:2]) / len(datums)*100):.2f} %\n\n")
 
 
+# Tidy up after merge, press 'n' to keep the individual PDFs
+# or 'y' to delete all temporary files
 def del_temp_fp():
-    # check for deleting of tmp-files
-    # only for debugging with choice. later on deleting without asking when function is called
     while True:
         choice = input('delete tmp files? [y] , [n]  ')
         if choice == 'y':
@@ -132,28 +112,29 @@ def del_temp_fp():
             break
 
 
-def get_datum():
-    # Einzusetzendes Datum
-    month = input('monat eingeben (01-12):  ')
+# get dates to paste into PDF 'date' Form-Field
+def get_date():
+    month = input('Choose Month (01-12):  ')
+    year = input('Choose year:   ')
     for i in range(1, 32):
         if i < 10:
-            datums.append(f"0{i}.{month}.2022")
+            datums.append(f"0{i}.{month}.{year}")
         else:
-            datums.append(f"{i}.{month}.2022")
+            datums.append(f"{i}.{month}.{year}")
 
 
-def run():
-    get_datum()
+# main starting point of scripts
+def run(_paths):
+    get_date()
     bash_ui('\nStarting set 1 ----\n\n')
-    urex(output_file_urex, tmp_path, template_path, blank_path)
+    with_group_selector(paths[1], output_file_with_group_selector, tmp_path, template_path, blank_path)
     bash_ui('\nStarting set 2 ----\n\n')
-    wen(output_file_wnd, tmp_path, template_path)
+    without_group_selector(paths[2], output_file_without_group_selector, tmp_path, template_path)
     # Clean up
     del_temp_fp()
 
 
+# run python main.py path_to_first_file path_to_second_file
 if __name__ == '__main__':
-    run()
-    #get_datum()
-    #wen(output_file_wnd, tmp_path, template_path)
-    #urex(output_file_urex, tmp_path, template_path, blank_path)
+    paths = sys.argv[:2]
+    run(paths)
