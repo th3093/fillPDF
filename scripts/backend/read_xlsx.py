@@ -1,6 +1,11 @@
 import pandas as pd
 
 
+# Rearrange data to list of dicts containing paste in ready strings for PDF Form
+# Input:    data as dict of pd dataframe
+#           deco as decorator for selecting columns of the given dataset
+#           grouping_flag as bool to group for column and sort inside group
+# Output:   List of Array of entries with paste in ready strings for PDF Form
 def sort_data(data, deco, gp_flag):
     final_data = {}
     if deco and gp_flag:
@@ -36,7 +41,13 @@ def sort_data(data, deco, gp_flag):
     return final_data
 
 
+# Read data from xlsx file and return json like object
+# Input:    database as path to xlsx file
+#           sort_by_list as list of columns for selecting of the given dataset
+#           grouping_flag as bool to group for column and sort inside group
+# Output:   List of Array of all rows in xlsx with selected columns
 def read_and_preprocess(database, sort_by_list, grouping_flag):
+    # read xlsx file
     data_init = pd.read_excel(database)
 
     if sort_by_list:
@@ -44,7 +55,9 @@ def read_and_preprocess(database, sort_by_list, grouping_flag):
             if el in data_init.columns:
                 df = data_init.sort_values(by=sort_by_list)
                 df = df.reset_index(drop=True)
+                # create dict from data by columns as key
                 data = df.to_dict(orient='index')
+                # sort and create Form strings
                 data_f = sort_data(data, sort_by_list[0], grouping_flag)
                 return data_f
             else:

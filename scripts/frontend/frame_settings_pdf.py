@@ -4,11 +4,12 @@ from tkinter import *
 from threading import Thread
 
 
+# Settings Frame
 class Settings(Frame):
     def __init__(self, container, controller):
         super().__init__(container)
 
-        #
+        # Heading Label
         self.heading = Label(self, text="Settings", anchor=N, font=container.fonts["HEADING_FONT"])
         self.heading.grid(row=0, column=0, padx=50, pady=5, ipady=0, ipadx=0, sticky="nw")
 
@@ -18,7 +19,7 @@ class Settings(Frame):
         self.div_page_flag = BooleanVar()
         self.grouping_flag = BooleanVar()
 
-        # del_tmp
+        # del_tmp label + checkbutton
         self.del_tmp_label = Label(self,
                                    text="Delete temporary files",
                                    font=container.fonts["LARGE_FONT"]
@@ -33,7 +34,7 @@ class Settings(Frame):
         self.del_tmp.set(True)
         self.del_tmp_checkbutton.grid(column=2, row=1, padx=10, sticky="w")
 
-        # blank_filling
+        # blank_filling label + checkbutton
         self.blank_filling_label = Label(self,
                                          text="Add blank pages as divider",
                                          font=container.fonts["LARGE_FONT"]
@@ -46,6 +47,7 @@ class Settings(Frame):
             offvalue=False,
             command=self.set_blank_filling
         ).grid(column=2, row=2, padx=10, sticky="w")
+
         # blank filling additional input of pdf pages per printed page to calculate filling
         self.blank_filling_quotient_label_placehodler = Label(self, width=40, height=2)
         self.blank_filling_quotient_label_placehodler.grid(column=3, row=3)
@@ -61,7 +63,7 @@ class Settings(Frame):
         self.blank_filling_quotient_entry.insert(0, f"{1}")
         self.blank_filling_quotient_entry.grid_remove()
 
-        # sort_by
+        # sort_by  label + entry
         self.sort_by_label = Label(self,
                                    text="Which columns to sort?",
                                    fg="black",
@@ -73,7 +75,7 @@ class Settings(Frame):
         self.sort_by_entry.insert(0, self.default_sort_by_entry)
         self.sort_by_entry.grid(row=4, column=2, padx=10, sticky="w")
 
-        # grouping_flag
+        # grouping_flag label + checkbutton
         self.grouping_label = Label(self,
                                     text="Group entries?",
                                     font=container.fonts["LARGE_FONT"]
@@ -87,7 +89,7 @@ class Settings(Frame):
         )
         self.grouping_checkbutton.grid(column=2, row=5, padx=10, sticky="w")
 
-        # divider_page_flag
+        # divider_page_flag label + checkbutton
         self.divider_page_label = Label(self,
                                         text="Insert titled divider pages?",
                                         font=container.fonts["LARGE_FONT"]
@@ -102,8 +104,8 @@ class Settings(Frame):
         self.divider_page_checkbutton.grid(column=2, row=6, padx=10, sticky="w")
 
         self.properties = {}
-        # self.grid(column=0, row=1, padx=5, pady=5, sticky='ew')
 
+    # show / hide blank_filling quotient label and entry
     def set_blank_filling(self):
         blank_filling = self.blank_filling.get()
         if blank_filling:
@@ -113,6 +115,7 @@ class Settings(Frame):
             self.blank_filling_quotient_label.grid_remove()
             self.blank_filling_quotient_entry.grid_remove()
 
+    # get all properties relevant to backend script execution
     def get_properties(self):
         if self.sort_by_entry.get() != self.default_sort_by_entry:
             sort_by = self.sort_by_entry.get()
@@ -129,6 +132,7 @@ class Settings(Frame):
         }
         return self.properties
 
+    # set all properties relevant to backend script execution
     def set_properties(self, del_tmp_, sort_by_, bf_, fq_, div_f_, gp_f_):
         self.del_tmp.set(del_tmp_)
         self.sort_by_entry = sort_by_
@@ -138,6 +142,7 @@ class Settings(Frame):
         self.grouping_flag = gp_f_
 
 
+# PdfAutoFill Frame
 class PdfAutoFill(Frame):
     def __init__(self, container, controller, settings_container):
         super().__init__(container)
@@ -155,7 +160,7 @@ class PdfAutoFill(Frame):
                              )
         self.heading.grid(row=0, column=0, padx=50, pady=5, ipady=0, ipadx=0, sticky="nw")
 
-        # month
+        # month label + entry
         self.month_input_label = Label(self,
                                        text="Month",
                                        font=container.fonts["LARGE_FONT"]
@@ -164,6 +169,7 @@ class PdfAutoFill(Frame):
         self.month_input_entry = Entry(self)
         self.month_input_entry.grid(row=1, column=1, sticky='w')
 
+        # month_only checkbutton
         self.month_only_checkbtn = Checkbutton(self,
                                                text="Total month (j/n)",
                                                font=container.fonts["NORM_FONT"],
@@ -174,6 +180,7 @@ class PdfAutoFill(Frame):
                                                )
         self.month_only_checkbtn.grid(row=2, column=1, pady=5, sticky='e')
 
+        # startday label + entry
         self.startday_input_label = Label(self,
                                           text="Starting day",
                                           font=container.fonts["LARGE_FONT"]
@@ -183,6 +190,7 @@ class PdfAutoFill(Frame):
         self.startday_input_entry = Entry(self)
         self.startday_input_entry.grid(row=3, column=1, pady=10, sticky='w')
 
+        # endday label + entry
         self.endday_input_label = Label(self,
                                         text="End day",
                                         font=container.fonts["LARGE_FONT"]
@@ -192,7 +200,7 @@ class PdfAutoFill(Frame):
         self.endday_input_entry = Entry(self)
         self.endday_input_entry.grid(row=4, column=1, padx=0, pady=10, sticky='w')
 
-        # Input File
+        # Input File label + button
         self.input_file_label = Label(self,
                                       text="",
                                       font=container.fonts["NORM_FONT"],
@@ -208,7 +216,7 @@ class PdfAutoFill(Frame):
                                         )
         self.input_file_button.grid(row=1, column=3, padx=5, pady=0, sticky="nsew")
 
-        # Output File
+        # Output File label + button
         self.output_path_label = Label(self,
                                        text="",
                                        font=container.fonts["NORM_FONT"],
@@ -239,6 +247,7 @@ class PdfAutoFill(Frame):
         self.month_only.set(True)
         self.set_day_entries()
 
+    # show / hide day entries
     def set_day_entries(self):
         entry_box = self.month_only.get()
         if entry_box:
@@ -248,6 +257,7 @@ class PdfAutoFill(Frame):
             self.startday_input_entry.config(state="normal")
             self.endday_input_entry.config(state="normal")
 
+    # filedialogs for input and ouptut paths
     def select_file(self, deco):
         if deco == 'in':
             self.input_path = filedialog.askopenfilename(title="Input files",
@@ -258,11 +268,11 @@ class PdfAutoFill(Frame):
                                                        initialdir="/")
             self.output_path_label.config(text=f"Output: {self.output_path.split('/')[-1]}")
 
+    # start background thread of main_back.py run()
     def start(self):
 
         if self.month_only.get():
             params = self.settings_container.get_properties()
-            print("I am wrong here")
             runner = Thread(target=main_back.run,
                             args=[self.input_path,
                                   self.output_path,
@@ -279,9 +289,6 @@ class PdfAutoFill(Frame):
 
         elif self.month_input_entry.get() and self.startday_input_entry.get() and self.endday_input_entry.get():
             params = self.settings_container.get_properties()
-            print(f"\nframe_settings 296" + self.input_path)
-            print(
-                f"\nframe_settings 297: {[self.input_path, self.output_path, self.month_input_entry.get(), params['del_tmp'], params['blank_filling'], params['sort_by'], params['div_page_flag'], params['filling_quotient'], self.startday_input_entry.get(), self.endday_input_entry.get()]}\n")
             runner = Thread(target=main_back.run,
                             args=[self.input_path,
                                   self.output_path,
@@ -306,7 +313,5 @@ if __name__ == '__main__':
     root = Tk()
     root.geometry("1280x720")
     root.title("PDF Robot")
-    # app = PdfAutoFill(root)
     settings = Settings(root)
-    # root.mainloop()
     root.mainloop()

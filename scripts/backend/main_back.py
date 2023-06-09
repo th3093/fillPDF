@@ -4,7 +4,6 @@ main routine
 
 from scripts.backend import pdf_handler, read_xlsx
 import os
-from time import time
 
 
 group_dict = {
@@ -21,7 +20,7 @@ tmp_path = '../files/pdf_tmp/'
 template_path = '../data/template.pdf'
 blank_path = '../data/blank.pdf'
 
-datums = []
+dates = []
 
 
 # function for handling cmd output
@@ -53,12 +52,12 @@ def filler(
         fq,
         dp_flag,
         gp_flag):
-
+    # start preprocessing
     data = read_xlsx.read_and_preprocess(inp_fn, sb, gp_flag)
-
-    for datum in datums:
+    # date loop
+    for date in dates:
         tmp_files = []
-        output_fn = out_path + f"/final-{datum.replace('.', '-')}.pdf"
+        output_fn = out_path + f"/final-{date.replace('.', '-')}.pdf"
         pdf = pdf_handler.ProcessPdf(tmp_p, output_fn, template_p, blank_p, bf_flag, sb, fq)
 
         for act_group_id in data:
@@ -68,7 +67,7 @@ def filler(
                 index += 1
 
             for row in range(len(data[act_group_id])):
-                data[act_group_id][row]['date_time'] = datum
+                data[act_group_id][row]['date_time'] = date
                 tmp_files.append(pdf.add_data_to_pdf(data[act_group_id][row], index, act_group_id))
                 index += 1
 
@@ -76,17 +75,17 @@ def filler(
             if bf_flag:
                 while index % fq != 0:
                     tmp_files.append(pdf.blank_page_append(act_group_id, index))
-                    # tmp_files.append(pdf.divider_page('', act_group_id, index)) alternative //
                     index += 1
             bash_ui(f"\nFinished {act_group_id}:  {act_group_id} / {len(data)}" +
                     f"-----  {(act_group_id / len(data) * 100):.2f} %\n\n")
 
         print('Waiting on merge...')
         pdf_handler.merge_files(tmp_files, output_fn)
-        bash_ui(f"\nFinal PDFs finished:   {(int(datum[:2])+1)-int(datums[0][:2])} / {len(datums)}" +
-                f"-----  {(((int(datum[:2])+1)-int(datums[0][:2])) / len(datums)*100):.2f} %\n\n")
+        bash_ui(f"\nFinal PDFs finished:   {(int(date[:2])+1)-int(dates[0][:2])} / {len(dates)}" +
+                f"-----  {(((int(date[:2])+1) - int(dates[0][:2])) / len(dates) * 100):.2f} %\n\n")
 
 
+# Tidy up after merge; deleting temporary files
 def del_temp_fp():
     # check for deleting of tmp-files
     for f in os.listdir(tmp_path):
@@ -96,14 +95,16 @@ def del_temp_fp():
     print('tmp-files deleted. Bye!')
 
 
-def get_datum(month_, start_, end_):
+# get dates to paste into PDF 'date' Form-Field + for creating PDF per day
+def get_date(month_, start_, end_):
     for i in range(start_, end_+1):
         if i < 10:
-            datums.append(f"0{i}.{month_}.2023")
+            dates.append(f"0{i}.{month_}.2023")
         else:
-            datums.append(f"{i}.{month_}.2023")
+            dates.append(f"{i}.{month_}.2023")
 
 
+# main starting point of scripts
 def run(inp_fp,
         out_path,
         month,
@@ -116,10 +117,7 @@ def run(inp_fp,
         start_day=1,
         end_day=31):
 
-    timer = time()
-
-    print(f"\nmain_back 144: {start_day} - {end_day}\n")
-    get_datum(month, int(start_day), int(end_day))
+    get_date(month, int(start_day), int(end_day))
     if sort_by_raw != "":
         sort_by_raw = sort_by_raw.replace(" ", "").split(",")
         bash_ui('\nStarting with sorted data ----\n\n')
@@ -138,15 +136,10 @@ def run(inp_fp,
            grouping_flag)
 
     # Clean up
-    datums.clear()
+    dates.clear()
     if del_tmp_flag:
         del_temp_fp()
 
-    #timer end
-    print(time()-timer)
 
 if __name__ == '__main__':
-    run('07', False)
-    #get_datum()
-    #wen(output_file_wnd, tmp_path, template_path)
-    #filler(output_file_urex, tmp_path, template_path, blank_path)
+    pass

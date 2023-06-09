@@ -42,13 +42,15 @@ class App(tk.Tk):
                                       width=int(_WIDTH * self.size_factors["sidebar"][0]),
                                       height=int(_HEIGHT * self.size_factors["sidebar"][1]),
                                       pady=10
-                                      )  # , padx=10)
+                                      )
         self.frame_sidebar.grid(column=0, row=0, rowspan=10, sticky="NW")
 
         self.frame_sidebar.buttons = {}
+        # placeholder
         self.frame_sidebar.buttons['empty'] = tk.Label(self.frame_sidebar)
         self.frame_sidebar.buttons['empty'].grid(column=0, row=0, pady=_HEIGHT/15-1, sticky="w")
 
+        # settings button
         self.frame_sidebar.buttons["Settings"] = tk.Button(self.frame_sidebar,
                                                            text="Settings",
                                                            font=self.fonts["LARGE_FONT"],
@@ -62,12 +64,13 @@ class App(tk.Tk):
                                                            activebackground=SIDEBAR_COLORS[2],
                                                            activeforeground=SIDEBAR_COLORS[0]
                                                            )
-
         self.frame_sidebar.buttons["Settings"].grid(column=0, row=3, ipady=0, sticky="w")
 
+        # placeholder
         self.frame_sidebar.buttons['empty2'] = tk.Label(self.frame_sidebar)
         self.frame_sidebar.buttons['empty2'].grid(column=0, row=2, pady=_HEIGHT/15, sticky="w")
 
+        # PdfAutoFill button
         self.frame_sidebar.buttons["PdfAutoFill"] = tk.Button(self.frame_sidebar,
                                                               text="Fill PDFs",
                                                               font=self.fonts["LARGE_FONT"],
@@ -106,13 +109,8 @@ class App(tk.Tk):
         )
         self.show_page("Settings")
 
+    # display page by using page_name
     def show_page(self, page_name):
-        """
-            let us use the NAME of the class to display(the function show_frame
-            use directly the class).
-            when we use the class name, we can put our classes in different
-            files
-        """
         for b in self.frame_sidebar.buttons:
             self.frame_sidebar.buttons[b].config(bg=SIDEBAR_COLORS[0], fg=SIDEBAR_COLORS[1])
 
@@ -125,21 +123,11 @@ class App(tk.Tk):
                 return
         print(ERROR_404)
 
+    # raise frame to front
     def show_frame(self, cont):
-        """raise to the front the frame we want
-
-            :param cont: the frame
-        """
         frame = self.frames[cont]
         frame.grid(column=1, row=0, sticky="nsew", columnspan=10)
         frame.tkraise()
-        # frame.grid_propagate(0)
-
-
-class HomePage(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
 
 
 if __name__ == "__main__":
