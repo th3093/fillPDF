@@ -1,22 +1,26 @@
 import pandas as pd
 
 
-def run_u_w(data, deco, gp_flag):
+def sort_data(data, deco, gp_flag):
     final_data = {}
     if deco and gp_flag:
         for entry in data.keys():
+            # check if first member of deco
             try:
                 final_data[data[entry][deco]].append({
                     'name': f"{data[entry]['firstName']} {data[entry]['lastName']}",
                     'birth': data[entry]['birthDate'],
-                    'address': f"{data[entry]['street']} {data[entry]['number']}, {data[entry]['postalCode']} {data[entry]['city']}",
+                    'address': f"{data[entry]['street']} {data[entry]['number']}, " +
+                               f"{data[entry]['postalCode']} {data[entry]['city']}",
                     'date_time': ""
                 })
+            # if first occurrence create entry list of dicts
             except (KeyError, TypeError):
                 final_data[data[entry][deco]] = [{
                     'name': f"{data[entry]['firstName']} {data[entry]['lastName']}",
                     'birth': data[entry]['birthDate'],
-                    'address': f"{data[entry]['street']} {data[entry]['number']}, {data[entry]['postalCode']} {data[entry]['city']}",
+                    'address': f"{data[entry]['street']} {data[entry]['number']}, " +
+                               f"{data[entry]['postalCode']} {data[entry]['city']}",
                     'date_time': ""
                 }]
     else:
@@ -25,7 +29,8 @@ def run_u_w(data, deco, gp_flag):
             final_data[0].append({
                 'name': f"{data[entry]['firstName']} {data[entry]['lastName']}",
                 'birth': data[entry]['birthDate'],
-                'address': f"{data[entry]['street']} {data[entry]['number']}, {data[entry]['postalCode']} {data[entry]['city']}",
+                'address': f"{data[entry]['street']} {data[entry]['number']}, " +
+                           f"{data[entry]['postalCode']} {data[entry]['city']}",
                 'date_time': ""
             })
     return final_data
@@ -40,7 +45,7 @@ def read_and_preprocess(database, sort_by_list, grouping_flag):
                 df = data_init.sort_values(by=sort_by_list)
                 df = df.reset_index(drop=True)
                 data = df.to_dict(orient='index')
-                data_f = run_u_w(data, sort_by_list[0], grouping_flag)
+                data_f = sort_data(data, sort_by_list[0], grouping_flag)
                 return data_f
             else:
                 print("Sort_Filter_not_appliable - name not found")
