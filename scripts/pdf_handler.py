@@ -93,21 +93,6 @@ def merge_files(input_fpaths, output_fn):
 
 
 if __name__ == '__main__':
-    '''
-    data = [{'name': "Anonymous Participant", 'birth': "01.01.1999", 'address': "Langenamestraße 1, 12345 Musterstadt", 'date_time': "01.01.2022, 11:00"},
-            {'name': "c d", 'birth': "11.01.1999", 'address': "straße 1, 12345 musterstadt", 'date_time': "01.01.2022, 11:00"},
-            {'name': "e f", 'birth': "21.01.1999", 'address': "straße 1, 12345 musterstadt", 'date_time': "01.01.2022, 11:00"}]
-
-    temp_files = []
-
-    for row in range(len(data)):
-        output_file = f'pdf_final/final_pdf{row}.pdf'
-        pdf_template_path = '../data/template.pdf'
-        pdf = ProcessPdf('pdf_tmp/', output_file, pdf_template_path)
-        data_pdf = pdf.add_data_to_pdf(data[row])
-        temp_files.append(data_pdf)
-
-    '''
     x = pdfrw.PdfReader('../data/template.pdf')
     print(x)
     print(x.pages[0]['/Annots'])
