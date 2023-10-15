@@ -4,7 +4,7 @@ This repo contains two parts of the software, each is in its own branch.
 
 So check out "gui" for a more advanced version with simple tKinter GUI, or "console" for the plain console application. 
 
-The code has a demo template.pdf to try out. 
+The code has a demo template.pdf to play around. 
 
 Feel free to adapt the scripts to your own need.
 
